@@ -1,0 +1,74 @@
+-- [[ BRAINROT VIP: TRADE MASTER ]]
+-- Бұл скриптте Anti-Kick және Ghost Trade функциялары бар
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wall%20v3"))()
+local Window = Library:CreateWindow("BRAINROT VIP") -- Экранның ортасында шығады
+
+local Main = Window:CreateTab("Trade Exploit")
+local Guard = Window:CreateTab("Protection")
+
+-- Қол жеткізу (Remotes)
+local Net = game:GetService("ReplicatedStorage").Packages.Net
+local ReadyEvent = Net["RE/TradeService/Ready"]
+local RemoveFunction = Net["RF/TradeService/RemoveBrainrot"]
+
+local _G = {
+    Freeze = false,
+    AntiKick = true,
+    SecretReady = false
+}
+
+-- --- ТРЕЙД ФУНКЦИЯЛАРЫ ---
+
+Main:CreateToggle("Ghost Freeze (Scam)", function(state)
+    _G.Freeze = state
+    if state then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "VIP STATUS",
+            Text = "Freeze Қосылды! Затты алып тастасаң да тұра береді.",
+            Duration = 5
+        })
+    end
+end)
+
+Main:CreateButton("Instant Force Ready", function()
+    ReadyEvent:FireServer()
+end)
+
+Main:CreateToggle("Secret Auto-Ready", function(state)
+    _G.SecretReady = state
+end)
+
+-- --- ҚОРҒАНЫС ---
+
+Guard:CreateToggle("Anti-Kick Protection", function(state)
+    _G.AntiKick = state
+end)
+
+Guard:CreateButton("Hide Menu", function()
+    game:GetService("CoreGui")["BRAINROT VIP"].Enabled = false
+end)
+
+-- --- СКРИПТТІҢ МИЫ (HOOKING) ---
+
+local mt = getrawmetatable(game)
+local old = mt.__namecall
+setreadonly(mt, false)
+
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    
+    -- Anti-Kick: Сервер сені қуғысы келсе тоқтатады
+    if _G.AntiKick and method == "Kick" then
+        return nil
+    end
+
+    -- Ghost Trade: Затты алып тастау сигналын блоктайды
+    if _G.Freeze and self == RemoveFunction and (method == "InvokeServer" or method == "FireServer") then
+        return wait(9e9) -- Сигнал серверге жетпейді
+    end
+
+    return old(self, ...)
+end)
+
+setreadonly(mt, true)
