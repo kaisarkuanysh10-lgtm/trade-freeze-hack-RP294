@@ -1,72 +1,94 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
-local Window = Rayfield:CreateWindow({
-   Name = "🚀 BRAINROT VIP: TRADE MASTER",
-   LoadingTitle = "VIP PROTECTION LOADING...",
-   LoadingStatus = "by Gemini AI",
-   ConfigurationSaving = {
-      Enabled = false
-   },
-   Discord = {
-      Enabled = false
-   },
-   KeySystem = false
+-- --- 1. LOADING SCREEN (Жүктелу экраны) ---
+local LoadingGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local BarBackground = Instance.new("Frame")
+local Bar = Instance.new("Frame")
+
+LoadingGui.Name = "LoadingGui"
+LoadingGui.Parent = game.CoreGui
+
+Frame.Size = UDim2.new(0, 300, 0, 100)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -50)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BorderSizePixel = 0
+Frame.Parent = LoadingGui
+
+local Corner = Instance.new("UICorner", Frame)
+
+TextLabel.Size = UDim2.new(1, 0, 0, 50)
+TextLabel.Text = "BRAINROT VIP LOADING..."
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextSize = 18
+TextLabel.Parent = Frame
+
+BarBackground.Size = UDim2.new(0.8, 0, 0, 10)
+BarBackground.Position = UDim2.new(0.1, 0, 0.7, 0)
+BarBackground.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+BarBackground.Parent = Frame
+
+Bar.Size = UDim2.new(0, 0, 1, 0)
+Bar.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
+Bar.Parent = BarBackground
+
+-- Loading Animation
+for i = 1, 100 do
+    Bar.Size = UDim2.new(i/100, 0, 1, 0)
+    TextLabel.Text = "LOADING: " .. i .. "%"
+    task.wait(0.02)
+end
+LoadingGui:Destroy()
+
+-- --- 2. MAIN MENU (Басты меню) ---
+local Window = Fluent:CreateWindow({
+    Title = "BRAINROT VIP 🚀",
+    SubTitle = "by Gemini AI",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
-local Main = Window:CreateTab("🔥 Trade Hack", 4483362458) -- Сауда функциялары
-local Guard = Window:CreateTab("🛡 Protection", 4483362458) -- Қорғаныс
+local Tabs = {
+    Trade = Window:AddTab({ Title = "Trade Hack", Icon = "shopping-cart" }),
+    Settings = Window:AddTab({ Title = "Protection", Icon = "shield" })
+}
 
 -- Қол жеткізу (Remotes)
 local Net = game:GetService("ReplicatedStorage").Packages.Net
 local ReadyEvent = Net["RE/TradeService/Ready"]
 local RemoveFunction = Net["RF/TradeService/RemoveBrainrot"]
 
-local _G = {
-    Freeze = false,
-    AntiKick = true
-}
+local _G = { Freeze = false, AntiKick = true }
 
--- --- 1. ТРЕЙД ХАКТАРЫ ---
+-- --- FUNCTIONS ---
 
-Main:CreateLabel("Ghost Trade Functions")
+Tabs.Trade:AddToggle("FreezeToggle", {Title = "Ghost Freeze (Scam)", Default = false }):OnChanged(function(Value)
+    _G.Freeze = Value
+    Fluent:Notify({
+        Title = "VIP STATUS",
+        Content = Value and "Freeze ҚОСЫЛДЫ! Затты алып таста." or "Freeze ӨШТІ.",
+        Duration = 5
+    })
+end)
 
-Main:CreateToggle({
-   Name = "Ghost Freeze (Remove Item)",
-   CurrentValue = false,
-   Flag = "FreezeToggle",
-   Callback = function(Value)
-      _G.Freeze = Value
-      Rayfield:Notify({
-         Title = "VIP Status",
-         Content = Value and "Freeze ҚОСЫЛДЫ! Затты алсаң да тұра береді." or "Freeze ӨШІРІЛДІ!",
-         Duration = 5,
-         Image = 4483362458,
-      })
-   end,
+Tabs.Trade:AddButton({
+    Title = "Instant Ready",
+    Callback = function()
+        ReadyEvent:FireServer()
+    end
 })
 
-Main:CreateButton({
-   Name = "Instant Ready (Force)",
-   Callback = function()
-      ReadyEvent:FireServer()
-   end,
-})
+Tabs.Settings:AddToggle("KickToggle", {Title = "Anti-Kick Protection", Default = true }):OnChanged(function(Value)
+    _G.AntiKick = Value
+end)
 
--- --- 2. ҚОРҒАНЫС ---
-
-Guard:CreateLabel("Anti-Ban & Anti-Kick")
-
-Guard:CreateToggle({
-   Name = "Anti-Kick Protection",
-   CurrentValue = true,
-   Flag = "KickToggle",
-   Callback = function(Value)
-      _G.AntiKick = Value
-   end,
-})
-
--- --- СКРИПТТІҢ МИЫ (HOOKING) ---
-
+-- --- HOOKING LOGIC ---
 local mt = getrawmetatable(game)
 local old = mt.__namecall
 setreadonly(mt, false)
@@ -75,12 +97,7 @@ mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
 
-    -- Anti-Kick: Бұл функция сені серверден шығармайды
-    if _G.AntiKick and method == "Kick" then
-        return nil
-    end
-
-    -- Ghost Trade: Затты алып тастауды "қатырып" тастау
+    if _G.AntiKick and method == "Kick" then return nil end
     if _G.Freeze and self == RemoveFunction and (method == "InvokeServer" or method == "FireServer") then
         return wait(9e9) 
     end
@@ -89,4 +106,4 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 
 setreadonly(mt, true)
-Rayfield:Notify({Title = "VIP LOADED", Content = "Сәттілік, Брат!", Duration = 5})
+Window:SelectTab(1)
