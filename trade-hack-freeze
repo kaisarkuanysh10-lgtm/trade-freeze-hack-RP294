@@ -1,11 +1,20 @@
--- [[ BRAINROT TRADING: THEFT & PROTECTION ]]
--- Created for VIP use only
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wall%20v3"))()
-local Window = Library:CreateWindow("BRAINROT VIP")
+local Window = Rayfield:CreateWindow({
+   Name = "🚀 BRAINROT VIP: TRADE MASTER",
+   LoadingTitle = "VIP PROTECTION LOADING...",
+   LoadingStatus = "by Gemini AI",
+   ConfigurationSaving = {
+      Enabled = false
+   },
+   Discord = {
+      Enabled = false
+   },
+   KeySystem = false
+})
 
-local Main = Window:CreateTab("Trade Exploit")
-local Guard = Window:CreateTab("Protection")
+local Main = Window:CreateTab("🔥 Trade Hack", 4483362458) -- Сауда функциялары
+local Guard = Window:CreateTab("🛡 Protection", 4483362458) -- Қорғаныс
 
 -- Қол жеткізу (Remotes)
 local Net = game:GetService("ReplicatedStorage").Packages.Net
@@ -14,38 +23,49 @@ local RemoveFunction = Net["RF/TradeService/RemoveBrainrot"]
 
 local _G = {
     Freeze = false,
-    AntiKick = true,
-    AutoAccept = false,
-    InvisibleTrade = false
+    AntiKick = true
 }
 
--- --- ТРЕЙД ХАКТАРЫ ---
+-- --- 1. ТРЕЙД ХАКТАРЫ ---
 
-Main:CreateToggle("Ghost Freeze (Scam)", function(state)
-    _G.Freeze = state
-    Library:Notify("FREEZE " .. (state and "ON" or "OFF"), "Затты алып тастасаң да, ана балада тұра береді.", 3)
-end)
+Main:CreateLabel("Ghost Trade Functions")
 
-Main:CreateButton("Instant Force Ready", function()
-    ReadyEvent:FireServer() --
-end)
+Main:CreateToggle({
+   Name = "Ghost Freeze (Remove Item)",
+   CurrentValue = false,
+   Flag = "FreezeToggle",
+   Callback = function(Value)
+      _G.Freeze = Value
+      Rayfield:Notify({
+         Title = "VIP Status",
+         Content = Value and "Freeze ҚОСЫЛДЫ! Затты алсаң да тұра береді." or "Freeze ӨШІРІЛДІ!",
+         Duration = 5,
+         Image = 4483362458,
+      })
+   end,
+})
 
-Main:CreateToggle("Invisible Mode", function(state)
-    _G.InvisibleTrade = state
-    -- Бұл функция сауда кезінде атыңды жасыруға көмектеседі
-end)
+Main:CreateButton({
+   Name = "Instant Ready (Force)",
+   Callback = function()
+      ReadyEvent:FireServer()
+   end,
+})
 
--- --- ҚОРҒАНЫС (ANTI-KICK) ---
+-- --- 2. ҚОРҒАНЫС ---
 
-Guard:CreateToggle("Anti-Kick (God Mode)", function(state)
-    _G.AntiKick = state
-end)
+Guard:CreateLabel("Anti-Ban & Anti-Kick")
 
-Guard:CreateButton("Clear All GUI", function()
-    game:GetService("CoreGui")["BRAINROT VIP"]:Destroy()
-end)
+Guard:CreateToggle({
+   Name = "Anti-Kick Protection",
+   CurrentValue = true,
+   Flag = "KickToggle",
+   Callback = function(Value)
+      _G.AntiKick = Value
+   end,
+})
 
--- --- СКРИПТТІҢ МИЫ (METATABLE BYPASS) ---
+-- --- СКРИПТТІҢ МИЫ (HOOKING) ---
 
 local mt = getrawmetatable(game)
 local old = mt.__namecall
@@ -55,20 +75,18 @@ mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
 
-    -- Anti-Kick: Егер сервер сені Kick жасағысы келсе, оны тоқтатады
+    -- Anti-Kick: Бұл функция сені серверден шығармайды
     if _G.AntiKick and method == "Kick" then
-        warn("VIP PROTECTION: Server tried to kick you!")
-        return nil 
+        return nil
     end
 
-    -- Ghost Trade: RemoveBrainrot сигналын серверге жібермей блоктайды
+    -- Ghost Trade: Затты алып тастауды "қатырып" тастау
     if _G.Freeze and self == RemoveFunction and (method == "InvokeServer" or method == "FireServer") then
-        print("GHOST: Item removal blocked!")
         return wait(9e9) 
     end
 
-    return old(self, unpack(args)) --
+    return old(self, unpack(args))
 end)
 
 setreadonly(mt, true)
-Library:Notify("VIP LOADED", "Go get those 1000 items!", 5)
+Rayfield:Notify({Title = "VIP LOADED", Content = "Сәттілік, Брат!", Duration = 5})
